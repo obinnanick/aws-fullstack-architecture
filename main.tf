@@ -9,7 +9,7 @@ resource "aws_vpc" "main_vpc" {
 }
 resource "aws_subnet" "public_subnets" {
   count = length(var.aws_public_subnet_cidr) #How many subnets to create which is already defined in the tfvar
-  vpc_id = aws_vpc.main_vpc #The VPC where is going to be deployed
+  vpc_id = aws_vpc.main_vpc.id #The VPC where is going to be deployed
   cidr_block = var.aws_public_subnet_cidr[count.index] #[count.index]Each subnet gets a unique CIDR from the list
   map_public_ip_on_launch = true #Ensures instances launched in this subnet automatically get a public IP. PS: Only for public subnets
 
@@ -20,22 +20,28 @@ resource "aws_subnet" "public_subnets" {
 }
 resource "aws_subnet" "private_subnet" {
     count = length(var.aws_private_subnet_cidr)
-    vpc_id = aws_vpc.main_vpc
+    vpc_id = aws_vpc.main_vpc.id
     cidr_block = var.aws_private_subnet_cidr[count.index]
     tags = {
       Name = "private_subnet-${count.index +1}"
     }
 }
 resource "aws_internet_gateway" "main_igw" {
-    vpc_id = aws_vpc.main_vpc
+    vpc_id = aws_vpc.main_vpc.id
     tags = {
       Name = "main_igw"
     }
   
 }
 resource "aws_route_table" "public_rt" {
-  vpc_id = aws_vpc.main_vpc
+  vpc_id = aws_vpc.main_vpc.id
   tags = {
     Name= "Public RT"
   }
+}
+resource "aws_route" "default_public_route" {
+  route_table_id = aws_route_table.public_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway.main_igw.id
+
 }
