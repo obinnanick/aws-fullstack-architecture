@@ -1,3 +1,4 @@
+#Task Role (Application-specific permissions)
 resource "aws_iam_role" "ecs_task_role" {
   name = "ecs_role"
   assume_role_policy = jsonencode({
@@ -18,4 +19,22 @@ resource "aws_iam_policy_attachment" "ec2_task_execution_policy" {
     name = "ec2-task-attachment-execution-policy"
   roles = [aws_iam_role.ecs_task_role.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+#Execution Role 
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name = "ecs_task_execution_role"
+  assume_role_policy = jsonencode({
+     Version = "2012-10-17"
+    Statement=[{
+        Effect = "Allow"
+        Principal = {
+            service = "ecs-tasks.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+    }]
+  })
+tags = {
+    name = "ecs execution role"
+  }
+   
 }
