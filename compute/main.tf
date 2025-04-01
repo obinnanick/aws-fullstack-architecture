@@ -56,7 +56,10 @@ resource "aws_ecs_service" "fargate_service" {
     desired_count = 1
     launch_type = "FARGATE"
     network_configuration {
-      subnets = [aws_private_subnet_cidr_1.id, aws_private_subnet_cidr_2.id]
+      subnets = [
+        aws_subnet.private_subnet[0].id,  # reference private subnet ID directly
+        aws_subnet.private_subnet[1].id   # reference private subnet ID directly
+      ]
       security_groups = [aws_security_group.ecs_sg.id]
       assign_public_ip = false
     }
