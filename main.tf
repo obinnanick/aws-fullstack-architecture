@@ -44,7 +44,7 @@ resource "aws_route_table_association" "public_association" {
   subnet_id = aws_subnet.public_subnets[count.index].id
   route_table_id = aws_route_table.public_rt.id
  }
-resource "aws_subnet" "private_subnet" {
+resource "aws_subnet" "private_subnets" {
     count = length(var.aws_private_subnet_cidr)
     vpc_id = aws_vpc.main_vpc.id
     cidr_block = var.aws_private_subnet_cidr[count.index]
@@ -82,6 +82,6 @@ resource "aws_route" "NAT_private_route" {
 #Associating Private subnets with the Private route
 resource "aws_route_table_association" "private_association" {
     count = length(var.aws_private_subnet_cidr)
-    subnet_id = aws_subnet.private_subnet[count.index].id
+    subnet_id = aws_subnet.private_subnets[count.index].id
     route_table_id = aws_route_table.private_rt.id
 }

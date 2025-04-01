@@ -57,11 +57,16 @@ resource "aws_ecs_service" "fargate_service" {
     launch_type = "FARGATE"
     network_configuration {
       subnets = [
-        aws_subnet.private_subnet[0].id,  # reference private subnet ID directly
-        aws_subnet.private_subnet[1].id   # reference private subnet ID directly
+        aws_subnet.private_subnets[0].id,  # reference private subnet ID directly
+        aws_subnet.private_subnets[1].id   # reference private subnet ID directly
       ]
       security_groups = [aws_security_group.ecs_sg.id]
       assign_public_ip = false
+    }
+    load_balancer {
+      target_group_arn = aws_lb_target_group.ecs_target.arn
+      container_name = "my-app-container"
+      container_port = 80
     }
   
 }
