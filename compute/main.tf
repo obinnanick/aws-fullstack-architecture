@@ -70,3 +70,29 @@ resource "aws_ecs_service" "fargate_service" {
     }
   
 }
+resource "aws_appautoscaling_target" "ecs_target" {
+  service_namespace = "ecs"
+  resource_id = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.fargate_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  max_capacity = 3
+  min_capacity = 1 
+}
+resource "aws_appautoscaling_policy" "ecs_policy" {
+    name = "ecs-scaling-policy"
+    resource_id = "service/${aws_appautoscaling_target.ecs_target.id}"
+    service_namespace = "ecs"
+    scalable_dimension = "ecs:service:DesiredCount"
+    policy_type = "TargetTrackingScaling"
+
+    target_tracking_scaling_policy_configuration {
+      predefined_metric_specification {
+        predefined_metric_type = "ECSServiceCPUUtilization"
+      }
+      target_value = 50.0
+      scale_in_cooldown = 60
+      scale_out_cooldown = 60
+
+    }
+
+  
+}
