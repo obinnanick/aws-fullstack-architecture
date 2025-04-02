@@ -26,3 +26,23 @@ resource "aws_lb_listener" "ecs_listener" {
     type = "forward"
   }
 }
+resource "aws_appautoscaling_target" "ecs_target" {
+  max_capacity = 5
+  min_capacity = 1
+  resource_id = "service /${aws_cluster.ecs_cluster.name}/${aws_ecs_service.fargate_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace = "ecs"
+}
+resource "aws_appautoscaling_policy" "ecs_scaling" {
+name = "ECS scaling"
+scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+service_namespace = aws_appautoscaling_target.ecs_target.service_namespace
+resource_id = aws_appautoscaling_target.ecs_target.resource_id
+
+target_tracking_scaling_policy_configuration {
+  target_value = 50
+  predefined_metric_specification {
+    predefined_metric_type = "ECSServiceAverageCPUUtilization"
+  }
+}
+}
