@@ -5,5 +5,5 @@ output "aws_public_subnet_cidr" {
   value = aws_subnet.public_subnets[*].id
 }
 output "aws_private_subnet_cidr" {
-  value = aws_subnet.private_subnet[*].id
+  value = aws_subnet.private_subnets[*].id
 }
